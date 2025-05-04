@@ -1,0 +1,96 @@
+app.py 
+
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+# Global variables to hold results
+add_result = None
+sub_result = None
+num1 = num2 = num3 = num4 = None
+add_error = sub_error = None
+
+@app.route('/')
+def index():
+    return render_template(
+        'index.html',
+        add_result=add_result,
+        sub_result=sub_result,
+        num1=num1,
+        num2=num2,
+        num3=num3,
+        num4=num4,
+        add_error=add_error,
+        sub_error=sub_error
+    )
+
+@app.route('/add', methods=['POST'])
+def add():
+    global add_result, num1, num2, add_error
+    try:
+        num1 = int(request.form['num1'])
+        num2 = int(request.form['num2'])
+        add_result = num1 + num2
+        add_error = None
+    except ValueError:
+        add_result = None
+        add_error = "Invalid input. Please enter numbers."
+    return index()
+
+@app.route('/subtract', methods=['POST'])
+def subtract():
+    global sub_result, num3, num4, sub_error
+    try:
+        num3 = int(request.form['num3'])
+        num4 = int(request.form['num4'])
+        sub_result = num3 - num4
+        sub_error = None
+    except ValueError:
+        sub_result = None
+        sub_error = "Invalid input. Please enter numbers."
+    return index()
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+-----------------------------------------------------------------
+index.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Add Web Service</title>
+</head>
+<body>
+    <h2>Enter Two Numbers to Add:</h2>
+    <form method="POST" action="/add">
+        <input type="text" name="num1" placeholder="First Number" required>
+        <input type="text" name="num2" placeholder="Second Number" required>
+        <button type="submit">Add</button>
+    </form>
+
+    {% if add_result is not none %}
+        <h3>Result: {{ num1 }} + {{ num2 }} = {{ add_result }}</h3>
+    {% endif %}
+
+    {% if add_error %}
+        <p style="color:red;">{{ add_error }}</p>
+    {% endif %}
+
+    <h2>Enter Two Numbers to Subtract:</h2>
+    <form method="POST" action="/subtract">
+        <input type="text" name="num3" placeholder="First Number" required>
+        <input type="text" name="num4" placeholder="Second Number" required>
+        <button type="submit">Subtract</button>
+    </form>
+
+    {% if sub_result is not none %}
+        <h3>Result: {{ num3 }} - {{ num4 }} = {{ sub_result }}</h3>
+    {% endif %}
+
+    {% if sub_error %}
+        <p style="color:red;">{{ sub_error }}</p>
+    {% endif %}
+</body>
+</html>
